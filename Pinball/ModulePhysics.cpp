@@ -29,11 +29,99 @@ bool ModulePhysics::Start()
 	LOG("Creating Physics 2D environment");
 
 	world = new b2World(b2Vec2(GRAVITY_X, -GRAVITY_Y));
+	b2BodyDef map;
+	map.type = b2_staticBody;
+	map.position.Set(0,0 );
+	b2Body* map_borders = world->CreateBody(&map);
 
-	// big static circle as "ground" in the middle of the screen
-	int x = SCREEN_WIDTH / 2;
-	int y = SCREEN_HEIGHT / 1.5f;
-	int diameter = SCREEN_WIDTH / 2;
+	int map_points[148] = {
+		428, 688,
+		449, 688,
+		449, 661,
+		450, 606,
+		451, 531,
+		451, 451,
+		450, 352,
+		450, 245,
+		450, 177,
+		444, 148,
+		421, 113,
+		396, 83,
+		360, 58,
+		332, 41,
+		299, 30,
+		255, 27,
+		214, 35,
+		184, 48,
+		154, 66,
+		126, 92,
+		114, 109,
+		119, 132,
+		126, 152,
+		67, 178,
+		55, 127,
+		43, 94,
+		23, 95,
+		26, 140,
+		30, 184,
+		34, 222,
+		41, 271,
+		51, 319,
+		65, 359,
+		76, 389,
+		94, 421,
+		122, 459,
+		80, 538,
+		61, 575,
+		59, 636,
+		59, 715,
+		169, 771,
+		168, 783,
+		147, 800,
+		140, 911,
+		351, 904,
+		348, 806,
+		293, 782,
+		294, 768,
+		401, 713,
+		403, 553,
+		380, 528,
+		380, 448,
+		420, 427,
+		420, 321,
+		389, 300,
+		388, 268,
+		421, 250,
+		427, 181,
+		421, 152,
+		402, 117,
+		371, 85,
+		322, 58,
+		305, 79,
+		332, 104,
+		354, 132,
+		364, 159,
+		370, 184,
+		428, 185,
+		433, 244,
+		431, 307,
+		431, 361,
+		433, 440,
+		431, 536,
+		428, 682
+	};
+	b2Vec2 chain[74];
+	int i = 0, j = 0;
+	for (; i < 148; i++, j++) {
+		chain[j].Set(PIXEL_TO_METERS(map_points[i]), PIXEL_TO_METERS(map_points[i + 1]));
+		i++;
+	}
+	b2ChainShape borders;
+	borders.CreateChain(chain,74);
+
+	b2FixtureDef fixture;
+	fixture.shape = &borders;
+	map_borders->CreateFixture(&fixture);
 
 	
 
