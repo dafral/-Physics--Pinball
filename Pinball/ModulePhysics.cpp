@@ -29,14 +29,132 @@ bool ModulePhysics::Start()
 	LOG("Creating Physics 2D environment");
 
 	world = new b2World(b2Vec2(GRAVITY_X, -GRAVITY_Y));
+	b2BodyDef map;
+	map.type = b2_staticBody;
+	map.position.Set(0,0 );
+	b2Body* map_borders = world->CreateBody(&map);
 
-	// big static circle as "ground" in the middle of the screen
-	int x = SCREEN_WIDTH / 2;
-	int y = SCREEN_HEIGHT / 1.5f;
-	int diameter = SCREEN_WIDTH / 2;
+	int map_points[148] = {
+		428, 688,
+		449, 688,
+		449, 661,
+		450, 606,
+		451, 531,
+		451, 451,
+		450, 352,
+		450, 245,
+		450, 177,
+		444, 148,
+		421, 113,
+		396, 82,
+		362, 57,
+		332, 41,
+		299, 30,
+		255, 27,
+		214, 35,
+		184, 48,
+		154, 66,
+		126, 92,
+		114, 109,
+		119, 132,
+		126, 152,
+		67, 178,
+		55, 127,
+		43, 94,
+		23, 95,
+		26, 140,
+		30, 184,
+		34, 222,
+		41, 271,
+		51, 319,
+		65, 359,
+		76, 389,
+		94, 421,
+		122, 459,
+		80, 538,
+		61, 575,
+		59, 636,
+		59, 715,
+		169, 771,
+		168, 783,
+		147, 800,
+		140, 911,
+		351, 904,
+		348, 806,
+		293, 782,
+		294, 768,
+		401, 713,
+		403, 553,
+		380, 528,
+		380, 448,
+		420, 427,
+		420, 321,
+		389, 300,
+		388, 268,
+		421, 250,
+		427, 181,
+		421, 152,
+		400, 117,
+		366, 86,
+		322, 58,
+		305, 79,
+		334, 103,
+		354, 131,
+		367, 155,
+		372, 181,
+		428, 185,
+		431, 241,
+		431, 307,
+		431, 361,
+		433, 440,
+		431, 536,
+		428, 682
+	};
+	b2Vec2 chain[74];
+	int i = 0, j = 0;
+	for (; i < 148; i++, j++) {
+		chain[j].Set(PIXEL_TO_METERS(map_points[i]), PIXEL_TO_METERS(map_points[i + 1]));
+		i++;
+	}
+	b2ChainShape borders;
+	borders.CreateChain(chain,74);
 
-	
-
+	b2FixtureDef fixture;
+	fixture.shape = &borders;
+	map_borders->CreateFixture(&fixture);
+	// Bouncer 1
+	b2BodyDef bouncing_circle1;
+	bouncing_circle1.type = b2_staticBody;
+	bouncing_circle1.position.Set(PIXEL_TO_METERS(206), PIXEL_TO_METERS(286));
+	b2Body* bouncing1 = world->CreateBody(&bouncing_circle1);
+	b2CircleShape bouncer;
+	bouncer.m_radius = PIXEL_TO_METERS(54)*0.5;
+	b2FixtureDef fixturebouncer1;
+	fixturebouncer1.shape = &bouncer;
+	bouncing1->CreateFixture(&fixturebouncer1);
+	bouncing1->GetFixtureList()->SetRestitution(1.3f);
+	//Bouncer 2
+	b2BodyDef bouncing_circle2;
+	bouncing_circle2.type = b2_staticBody;
+	bouncing_circle2.position.Set(PIXEL_TO_METERS(269), PIXEL_TO_METERS(213));
+	b2Body* bouncing2 = world->CreateBody(&bouncing_circle2);
+	b2CircleShape bouncer2;
+	bouncer2.m_radius = PIXEL_TO_METERS(54)*0.5;
+	b2FixtureDef fixturebouncer2;
+	fixturebouncer2.shape = &bouncer2;
+	bouncing2->CreateFixture(&fixturebouncer2);
+	bouncing2->GetFixtureList()->SetRestitution(1.3f);
+	//Bouncer 3
+	b2BodyDef bouncing_circle3;
+	bouncing_circle3.type = b2_staticBody;
+	bouncing_circle3.position.Set(PIXEL_TO_METERS(322), PIXEL_TO_METERS(289));
+	b2Body* bouncing3 = world->CreateBody(&bouncing_circle3);
+	b2CircleShape bouncer3;
+	bouncer3.m_radius = PIXEL_TO_METERS(54)*0.5;
+	b2FixtureDef fixturebouncer3;
+	fixturebouncer3.shape = &bouncer3;
+	bouncing3->CreateFixture(&fixturebouncer3);
+	bouncing3->GetFixtureList()->SetRestitution(1.3f);
 	return true;
 }
 
@@ -56,7 +174,7 @@ update_status ModulePhysics::PostUpdate()
 	{
 		b2BodyDef body;
 		body.type = b2_dynamicBody;
-		float radius = PIXEL_TO_METERS(25);
+		float radius = PIXEL_TO_METERS(8);
 		body.position.Set(PIXEL_TO_METERS(App->input->GetMouseX()), PIXEL_TO_METERS(App->input->GetMouseY()));
 
 		b2Body* b = world->CreateBody(&body);
@@ -67,6 +185,7 @@ update_status ModulePhysics::PostUpdate()
 		fixture.shape = &shape;
 
 		b->CreateFixture(&fixture);
+		b->GetFixtureList()->SetRestitution(0.3f);
 	}
 
 	if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
