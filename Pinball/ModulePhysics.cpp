@@ -46,8 +46,13 @@ bool ModulePhysics::Start()
 		450, 177,
 		444, 148,
 		421, 113,
+<<<<<<< HEAD
 		396, 82,
 		362, 57,
+=======
+		396, 83,
+		360, 58,
+>>>>>>> origin/master
 		332, 41,
 		299, 30,
 		255, 27,
@@ -94,6 +99,7 @@ bool ModulePhysics::Start()
 		421, 250,
 		427, 181,
 		421, 152,
+<<<<<<< HEAD
 		400, 117,
 		366, 86,
 		322, 58,
@@ -104,6 +110,18 @@ bool ModulePhysics::Start()
 		372, 181,
 		428, 185,
 		431, 241,
+=======
+		402, 117,
+		371, 85,
+		322, 58,
+		305, 79,
+		332, 104,
+		354, 132,
+		364, 159,
+		370, 184,
+		428, 185,
+		433, 244,
+>>>>>>> origin/master
 		431, 307,
 		431, 361,
 		433, 440,
@@ -122,6 +140,7 @@ bool ModulePhysics::Start()
 	b2FixtureDef fixture;
 	fixture.shape = &borders;
 	map_borders->CreateFixture(&fixture);
+<<<<<<< HEAD
 	// Bouncer 1
 	b2BodyDef bouncing_circle1;
 	bouncing_circle1.type = b2_staticBody;
@@ -155,6 +174,11 @@ bool ModulePhysics::Start()
 	fixturebouncer3.shape = &bouncer3;
 	bouncing3->CreateFixture(&fixturebouncer3);
 	bouncing3->GetFixtureList()->SetRestitution(1.3f);
+=======
+
+	
+
+>>>>>>> origin/master
 	return true;
 }
 

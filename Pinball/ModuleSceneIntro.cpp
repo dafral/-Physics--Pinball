@@ -22,7 +22,11 @@ bool ModuleSceneIntro::Start()
 
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
+<<<<<<< HEAD
 	background = App->textures->Load("pinball/background_without_kickers.png"); 
+=======
+	background = App->textures->Load("Game/pinball/background_without_kickers.png"); 
+>>>>>>> origin/master
 	
 
 	return ret;
