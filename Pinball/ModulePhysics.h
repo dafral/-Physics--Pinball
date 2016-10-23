@@ -37,4 +37,5 @@ private:
 
 	bool debug;
 	b2World* world;
+	b2Body* myBodyA;
 };

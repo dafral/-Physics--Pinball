@@ -110,12 +110,14 @@ bool ModulePhysics::Start()
 		431, 536,
 		428, 682
 	};
+
 	b2Vec2 chain[74];
 	int i = 0, j = 0;
 	for (; i < 148; i++, j++) {
 		chain[j].Set(PIXEL_TO_METERS(map_points[i]), PIXEL_TO_METERS(map_points[i + 1]));
 		i++;
 	}
+
 	b2ChainShape borders;
 	borders.CreateChain(chain,74);
 
@@ -123,10 +125,40 @@ bool ModulePhysics::Start()
 	fixture.shape = &borders;
 	map_borders->CreateFixture(&fixture);
 
+	//map details
+	/*b2BodyDef detail1;
+	detail1.type = b2_staticBody;
+	detail1.position.Set(0, 0);
+	b2Body* detail1_body = world->CreateBody(&detail1);
+
+	int detail1_points[12] = {
+		307, 723,
+		319, 725,
+		384, 687,
+		383, 603,
+		375, 604,
+		375, 684
+	};
+
+	b2Vec2 detail1_chain[6];
+	for (i=0,j=0; i < 12; i++, j++) {
+		detail1_chain[j].Set(PIXEL_TO_METERS(map_points[i]), PIXEL_TO_METERS(map_points[i + 1]));
+		i++;
+	}
+
+	b2ChainShape detail1_borders;
+	detail1_borders.CreateChain(detail1_chain, 6);
+
+	b2FixtureDef detail1_fixture;
+	detail1_fixture.shape = &detail1_borders;
+	detail1_body->CreateFixture(&detail1_fixture);*/
+
 	// Bouncer 1
 	b2BodyDef bouncing_circle1;
+
 	bouncing_circle1.type = b2_staticBody;
 	bouncing_circle1.position.Set(PIXEL_TO_METERS(206), PIXEL_TO_METERS(286));
+
 	b2Body* bouncing1 = world->CreateBody(&bouncing_circle1);
 	b2CircleShape bouncer;
 	bouncer.m_radius = PIXEL_TO_METERS(54)*0.5;
@@ -134,10 +166,13 @@ bool ModulePhysics::Start()
 	fixturebouncer1.shape = &bouncer;
 	bouncing1->CreateFixture(&fixturebouncer1);
 	bouncing1->GetFixtureList()->SetRestitution(1.3f);
+
 	//Bouncer 2
 	b2BodyDef bouncing_circle2;
+
 	bouncing_circle2.type = b2_staticBody;
 	bouncing_circle2.position.Set(PIXEL_TO_METERS(269), PIXEL_TO_METERS(213));
+
 	b2Body* bouncing2 = world->CreateBody(&bouncing_circle2);
 	b2CircleShape bouncer2;
 	bouncer2.m_radius = PIXEL_TO_METERS(54)*0.5;
@@ -145,10 +180,13 @@ bool ModulePhysics::Start()
 	fixturebouncer2.shape = &bouncer2;
 	bouncing2->CreateFixture(&fixturebouncer2);
 	bouncing2->GetFixtureList()->SetRestitution(1.3f);
+
 	//Bouncer 3
 	b2BodyDef bouncing_circle3;
+
 	bouncing_circle3.type = b2_staticBody;
 	bouncing_circle3.position.Set(PIXEL_TO_METERS(322), PIXEL_TO_METERS(289));
+
 	b2Body* bouncing3 = world->CreateBody(&bouncing_circle3);
 	b2CircleShape bouncer3;
 	bouncer3.m_radius = PIXEL_TO_METERS(54)*0.5;
@@ -157,10 +195,41 @@ bool ModulePhysics::Start()
 	bouncing3->CreateFixture(&fixturebouncer3);
 	bouncing3->GetFixtureList()->SetRestitution(1.3f);
 
+	//spring
+	b2BodyDef spring_box;
 
+	spring_box.type = b2_dynamicBody;
+	spring_box.position.Set(PIXEL_TO_METERS(438), PIXEL_TO_METERS(680));
+
+	myBodyA = world->CreateBody(&spring_box);
+	b2PolygonShape Spring_Box;
+	Spring_Box.SetAsBox(PIXEL_TO_METERS(8), PIXEL_TO_METERS(5));
+
+	b2FixtureDef spring_fixture;
+	spring_fixture.shape = &Spring_Box;
+	myBodyA->CreateFixture(&spring_fixture);
+
+	b2BodyDef spring_start;
+
+	spring_start.type = b2_staticBody;
+	spring_start.position.Set(PIXEL_TO_METERS(438), PIXEL_TO_METERS(693));
+
+	b2Body* myBodyB = world->CreateBody(&spring_start);
+	b2PolygonShape Spring_Start;
+	Spring_Start.SetAsBox(PIXEL_TO_METERS(8), PIXEL_TO_METERS(5));
+
+	b2FixtureDef spring_st_fixture;
+	spring_st_fixture.shape = &Spring_Start;
+	myBodyB->CreateFixture(&spring_st_fixture);
+
+	b2RopeJointDef spring_jointDef;
+	spring_jointDef.bodyA = myBodyA;
+	spring_jointDef.bodyB = myBodyB;
+	spring_jointDef.maxLength = 5;
+
+	b2RopeJoint* spring_joint = (b2RopeJoint*)world->CreateJoint(&spring_jointDef);
 	
-
-
+		
 	return true;
 }
 
@@ -176,6 +245,8 @@ update_status ModulePhysics::PreUpdate()
 update_status ModulePhysics::PostUpdate()
 {
 	// On space bar press, create a circle on mouse position
+	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {		myBodyA->ApplyLinearImpulse(b2Vec2(0, -35), myBodyA->GetWorldCenter(), false);	}	
+
 	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
 	{
 		b2BodyDef body;
@@ -192,6 +263,8 @@ update_status ModulePhysics::PostUpdate()
 
 		b->CreateFixture(&fixture);
 		b->GetFixtureList()->SetRestitution(0.3f);
+
+		//b->ApplyLinearImpulse(b2Vec2(0, -50), b->GetWorldCenter(), false);
 	}
 
 	if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
