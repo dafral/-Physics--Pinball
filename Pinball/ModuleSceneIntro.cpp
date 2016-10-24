@@ -6,6 +6,8 @@
 #include "ModuleTextures.h"
 #include "ModuleAudio.h"
 #include "ModulePhysics.h"
+#include "ModuleWindow.h"
+#include <cstdlib>
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -109,9 +111,11 @@ bool ModuleSceneIntro::Start()
 		bc->data->listener = this;
 	}
 
-	balls.add(App->physics->CreateCircle(434, 651, 8));
-	balls.getLast()->data->body->SetFixedRotation(true);
-	balls.getLast()->data->body->GetFixtureList()->SetRestitution(0.3f);
+	//game ball
+	ball = App->physics->CreateCircle(434, 651, 8);
+	ball->body->SetFixedRotation(true);
+	ball->body->GetFixtureList()->SetRestitution(0.3f);
+	
 
 
 	/*b2World* world;
@@ -164,13 +168,30 @@ update_status ModuleSceneIntro::Update()
 
 	App->renderer->Blit(background, 0, 0, NULL, 0, 0);
 
+	//shows score and balls remaining
+	char title[150];
+	char buffer[30];
+
+	//score
+	strcpy_s(title, "Score: ");
+	_itoa_s(score, buffer, 10);
+	strcat_s(title, buffer);
+
+	//balls
+	strcat_s(title, " Balls: ");
+	_itoa_s(balls, buffer, 10);
+	strcat_s(title, buffer);
+
+	App->window->SetTitle(title);
+
+
 	if(App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 	{
 		/*ray_on = !ray_on;
 		ray.x = App->input->GetMouseX();
 		ray.y = App->input->GetMouseY();*/
 		
-		//myBodyA->ApplyLinearImpulse(b2Vec2(0, -35), myBodyA->GetWorldCenter(), false);
+		ball->body->ApplyLinearImpulse(b2Vec2(0, -5), ball->body->GetWorldCenter(), false);
 	}
 
 	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
@@ -298,23 +319,34 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	else if (bodyA == loosing_sensor && reproducing == false) {
 		App->audio->PlayFx(start_fx);
 		reproducing = true;
+		balls--;
+		
+
 	}
 
-	else if (bodyA == air_sensor)
+	else if (bodyA == air_sensor) {
 		App->audio->PlayFx(air_fx);
+		score += 100;
+	}
 
-	else if (bodyA == grounded_sensor)
+	else if (bodyA == grounded_sensor) {
 		App->audio->PlayFx(grounded_fx);
+		score += 100;
+	}
 
 	else {
 		for (p2List_item<PhysBody*>* bc = green_sensors.getFirst(); bc != NULL; bc = bc->next) {
-			if (bc->data == bodyA)
+			if (bc->data == bodyA) {
 				App->audio->PlayFx(woob_fx);
+				score += 10;
+			}
 		}
 
 		for (p2List_item<PhysBody*>* bc = circles.getFirst(); bc != NULL; bc = bc->next) {
-			if (bc->data == bodyA)
+			if (bc->data == bodyA) {
 				App->audio->PlayFx(iron_fx);
+				score += 10;
+			}
 		}
 		
 	}

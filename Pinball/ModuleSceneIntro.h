@@ -19,7 +19,10 @@ public:
 
 public:
 	//balls available
-	p2List<PhysBody*> balls;
+	PhysBody* ball;
+	uint balls = 3;
+
+	uint score = 0;
 
 	p2List<PhysBody*> boxes;
 	p2List<PhysBody*> ricks;
