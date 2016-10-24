@@ -3,9 +3,8 @@
 #include "ModuleInput.h"
 #include "ModuleRender.h"
 #include "ModulePhysics.h"
+#include "p2Point.h"
 #include "math.h"
-
-#include "Box2D/Box2D/Box2D.h"
 
 #ifdef _DEBUG
 #pragma comment( lib, "Box2D/libx86/Debug/Box2D.lib" )
@@ -16,6 +15,7 @@
 ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	world = NULL;
+	mouse_joint = NULL;
 	debug = true;
 }
 
@@ -29,207 +29,14 @@ bool ModulePhysics::Start()
 	LOG("Creating Physics 2D environment");
 
 	world = new b2World(b2Vec2(GRAVITY_X, -GRAVITY_Y));
-	b2BodyDef map;
-	map.type = b2_staticBody;
-	map.position.Set(0,0 );
-	b2Body* map_borders = world->CreateBody(&map);
+	world->SetContactListener(this);
 
-	int map_points[148] = {
-		428, 688,
-		449, 688,
-		449, 661,
-		450, 606,
-		451, 531,
-		451, 451,
-		450, 352,
-		450, 245,
-		450, 177,
-		444, 148,
-		421, 113,
-		396, 82,
-		362, 57,
-		332, 41,
-		299, 30,
-		255, 27,
-		214, 35,
-		184, 48,
-		154, 66,
-		126, 92,
-		114, 109,
-		119, 132,
-		126, 152,
-		67, 178,
-		55, 127,
-		43, 94,
-		23, 95,
-		26, 140,
-		30, 184,
-		34, 222,
-		41, 271,
-		51, 319,
-		65, 359,
-		76, 389,
-		94, 421,
-		122, 459,
-		80, 538,
-		61, 575,
-		59, 636,
-		59, 715,
-		169, 771,
-		168, 783,
-		147, 800,
-		140, 911,
-		351, 904,
-		348, 806,
-		293, 782,
-		294, 768,
-		401, 713,
-		403, 553,
-		380, 528,
-		380, 448,
-		420, 427,
-		420, 321,
-		389, 300,
-		388, 268,
-		421, 250,
-		427, 181,
-		421, 152,
-		400, 117,
-		366, 86,
-		322, 58,
-		305, 79,
-		334, 103,
-		354, 131,
-		367, 155,
-		372, 181,
-		428, 185,
-		431, 241,
-		431, 307,
-		431, 361,
-		433, 440,
-		431, 536,
-		428, 682
-	};
-
-	b2Vec2 chain[74];
-	int i = 0, j = 0;
-	for (; i < 148; i++, j++) {
-		chain[j].Set(PIXEL_TO_METERS(map_points[i]), PIXEL_TO_METERS(map_points[i + 1]));
-		i++;
-	}
-
-	b2ChainShape borders;
-	borders.CreateChain(chain,74);
-
-	b2FixtureDef fixture;
-	fixture.shape = &borders;
-	map_borders->CreateFixture(&fixture);
-
-	//map details
-	/*b2BodyDef detail1;
-	detail1.type = b2_staticBody;
-	detail1.position.Set(0, 0);
-	b2Body* detail1_body = world->CreateBody(&detail1);
-
-	int detail1_points[12] = {
-		307, 723,
-		319, 725,
-		384, 687,
-		383, 603,
-		375, 604,
-		375, 684
-	};
-
-	b2Vec2 detail1_chain[6];
-	for (i=0,j=0; i < 12; i++, j++) {
-		detail1_chain[j].Set(PIXEL_TO_METERS(map_points[i]), PIXEL_TO_METERS(map_points[i + 1]));
-		i++;
-	}
-
-	b2ChainShape detail1_borders;
-	detail1_borders.CreateChain(detail1_chain, 6);
-
-	b2FixtureDef detail1_fixture;
-	detail1_fixture.shape = &detail1_borders;
-	detail1_body->CreateFixture(&detail1_fixture);*/
-
-	// Bouncer 1
-	b2BodyDef bouncing_circle1;
-
-	bouncing_circle1.type = b2_staticBody;
-	bouncing_circle1.position.Set(PIXEL_TO_METERS(206), PIXEL_TO_METERS(286));
-
-	b2Body* bouncing1 = world->CreateBody(&bouncing_circle1);
-	b2CircleShape bouncer;
-	bouncer.m_radius = PIXEL_TO_METERS(54)*0.5;
-	b2FixtureDef fixturebouncer1;
-	fixturebouncer1.shape = &bouncer;
-	bouncing1->CreateFixture(&fixturebouncer1);
-	bouncing1->GetFixtureList()->SetRestitution(1.3f);
-
-	//Bouncer 2
-	b2BodyDef bouncing_circle2;
-
-	bouncing_circle2.type = b2_staticBody;
-	bouncing_circle2.position.Set(PIXEL_TO_METERS(269), PIXEL_TO_METERS(213));
-
-	b2Body* bouncing2 = world->CreateBody(&bouncing_circle2);
-	b2CircleShape bouncer2;
-	bouncer2.m_radius = PIXEL_TO_METERS(54)*0.5;
-	b2FixtureDef fixturebouncer2;
-	fixturebouncer2.shape = &bouncer2;
-	bouncing2->CreateFixture(&fixturebouncer2);
-	bouncing2->GetFixtureList()->SetRestitution(1.3f);
-
-	//Bouncer 3
-	b2BodyDef bouncing_circle3;
-
-	bouncing_circle3.type = b2_staticBody;
-	bouncing_circle3.position.Set(PIXEL_TO_METERS(322), PIXEL_TO_METERS(289));
-
-	b2Body* bouncing3 = world->CreateBody(&bouncing_circle3);
-	b2CircleShape bouncer3;
-	bouncer3.m_radius = PIXEL_TO_METERS(54)*0.5;
-	b2FixtureDef fixturebouncer3;
-	fixturebouncer3.shape = &bouncer3;
-	bouncing3->CreateFixture(&fixturebouncer3);
-	bouncing3->GetFixtureList()->SetRestitution(1.3f);
+	// needed to create joints like mouse joint
+	b2BodyDef bd;
+	ground = world->CreateBody(&bd);
 
 	//spring
-	b2BodyDef spring_box;
-
-	spring_box.type = b2_dynamicBody;
-	spring_box.position.Set(PIXEL_TO_METERS(438), PIXEL_TO_METERS(680));
-
-	myBodyA = world->CreateBody(&spring_box);
-	b2PolygonShape Spring_Box;
-	Spring_Box.SetAsBox(PIXEL_TO_METERS(8), PIXEL_TO_METERS(5));
-
-	b2FixtureDef spring_fixture;
-	spring_fixture.shape = &Spring_Box;
-	myBodyA->CreateFixture(&spring_fixture);
-
-	b2BodyDef spring_start;
-
-	spring_start.type = b2_staticBody;
-	spring_start.position.Set(PIXEL_TO_METERS(438), PIXEL_TO_METERS(693));
-
-	b2Body* myBodyB = world->CreateBody(&spring_start);
-	b2PolygonShape Spring_Start;
-	Spring_Start.SetAsBox(PIXEL_TO_METERS(8), PIXEL_TO_METERS(5));
-
-	b2FixtureDef spring_st_fixture;
-	spring_st_fixture.shape = &Spring_Start;
-	myBodyB->CreateFixture(&spring_st_fixture);
-
-	b2RopeJointDef spring_jointDef;
-	spring_jointDef.bodyA = myBodyA;
-	spring_jointDef.bodyB = myBodyB;
-	spring_jointDef.maxLength = 5;
-
-	b2RopeJoint* spring_joint = (b2RopeJoint*)world->CreateJoint(&spring_jointDef);
 	
-		
 	return true;
 }
 
@@ -238,64 +45,133 @@ update_status ModulePhysics::PreUpdate()
 {
 	world->Step(1.0f / 60.0f, 6, 2);
 
+	for(b2Contact* c = world->GetContactList(); c; c = c->GetNext())
+	{
+		if(c->GetFixtureA()->IsSensor() && c->IsTouching())
+		{
+			PhysBody* pb1 = (PhysBody*)c->GetFixtureA()->GetBody()->GetUserData();
+			PhysBody* pb2 = (PhysBody*)c->GetFixtureA()->GetBody()->GetUserData();
+			if(pb1 && pb2 && pb1->listener)
+				pb1->listener->OnCollision(pb1, pb2);
+		}
+	}
+
 	return UPDATE_CONTINUE;
+}
+
+PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius)
+{
+	b2BodyDef body;
+	body.type = b2_dynamicBody;
+	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
+
+	b2Body* b = world->CreateBody(&body);
+
+	b2CircleShape shape;
+	shape.m_radius = PIXEL_TO_METERS(radius);
+	b2FixtureDef fixture;
+	fixture.shape = &shape;
+	fixture.density = 1.0f;
+
+	b->CreateFixture(&fixture);
+
+	PhysBody* pbody = new PhysBody();
+	pbody->body = b;
+	b->SetUserData(pbody);
+	pbody->width = pbody->height = radius;
+
+	return pbody;
+}
+
+PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height)
+{
+	b2BodyDef body;
+	body.type = b2_dynamicBody;
+	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
+
+	b2Body* b = world->CreateBody(&body);
+	b2PolygonShape box;
+	box.SetAsBox(PIXEL_TO_METERS(width) * 0.5f, PIXEL_TO_METERS(height) * 0.5f);
+
+	b2FixtureDef fixture;
+	fixture.shape = &box;
+	fixture.density = 1.0f;
+
+	b->CreateFixture(&fixture);
+
+	PhysBody* pbody = new PhysBody();
+	pbody->body = b;
+	b->SetUserData(pbody);
+	pbody->width = width * 0.5f;
+	pbody->height = height * 0.5f;
+
+	return pbody;
+}
+
+PhysBody* ModulePhysics::CreateRectangleSensor(int x, int y, int width, int height)
+{
+	b2BodyDef body;
+	body.type = b2_staticBody;
+	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
+
+	b2Body* b = world->CreateBody(&body);
+
+	b2PolygonShape box;
+	box.SetAsBox(PIXEL_TO_METERS(width) * 0.5f, PIXEL_TO_METERS(height) * 0.5f);
+
+	b2FixtureDef fixture;
+	fixture.shape = &box;
+	fixture.density = 1.0f;
+	fixture.isSensor = true;
+
+	b->CreateFixture(&fixture);
+
+	PhysBody* pbody = new PhysBody();
+	pbody->body = b;
+	b->SetUserData(pbody);
+	pbody->width = width;
+	pbody->height = height;
+
+	return pbody;
+}
+
+PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size)
+{
+	b2BodyDef body;
+	body.type = b2_dynamicBody;
+	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
+
+	b2Body* b = world->CreateBody(&body);
+
+	b2ChainShape shape;
+	b2Vec2* p = new b2Vec2[size / 2];
+
+	for(uint i = 0; i < size / 2; ++i)
+	{
+		p[i].x = PIXEL_TO_METERS(points[i * 2 + 0]);
+		p[i].y = PIXEL_TO_METERS(points[i * 2 + 1]);
+	}
+
+	shape.CreateLoop(p, size / 2);
+
+	b2FixtureDef fixture;
+	fixture.shape = &shape;
+
+	b->CreateFixture(&fixture);
+
+	delete p;
+
+	PhysBody* pbody = new PhysBody();
+	pbody->body = b;
+	b->SetUserData(pbody);
+	pbody->width = pbody->height = 0;
+
+	return pbody;
 }
 
 // 
 update_status ModulePhysics::PostUpdate()
 {
-	// On space bar press, create a circle on mouse position
-	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) {		myBodyA->ApplyLinearImpulse(b2Vec2(0, -35), myBodyA->GetWorldCenter(), false);	}	
-
-	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
-	{
-		b2BodyDef body;
-		body.type = b2_dynamicBody;
-		float radius = PIXEL_TO_METERS(8);
-		body.position.Set(PIXEL_TO_METERS(App->input->GetMouseX()), PIXEL_TO_METERS(App->input->GetMouseY()));
-
-		b2Body* b = world->CreateBody(&body);
-
-		b2CircleShape shape;
-		shape.m_radius = radius;
-		b2FixtureDef fixture;
-		fixture.shape = &shape;
-
-		b->CreateFixture(&fixture);
-		b->GetFixtureList()->SetRestitution(0.3f);
-
-		//b->ApplyLinearImpulse(b2Vec2(0, -50), b->GetWorldCenter(), false);
-	}
-
-	if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
-	{
-		// TODO 1: When pressing 2, create a box on the mouse position
-
-		// TODO 2: To have the box behave normally, set fixture's density to 1.0f
-	}
-
-	if(App->input->GetKey(SDL_SCANCODE_3) == KEY_DOWN)
-	{
-		// TODO 3: Create a chain shape using those vertices
-		// remember to convert them from pixels to meters!
-		/*
-		int points[24] = {
-			-38, 80,
-			-44, -54,
-			-16, -60,
-			-16, -17,
-			19, -19,
-			19, -79,
-			61, -77,
-			57, 73,
-			17, 78,
-			20, 16,
-			-25, 13,
-			-9, 72
-		};
-		*/
-	}
-
 	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
 		debug = !debug;
 
@@ -371,8 +247,23 @@ update_status ModulePhysics::PostUpdate()
 				}
 				break;
 			}
+
+			// TODO 1: If mouse button 1 is pressed ...
+			// App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN
+			// test if the current body contains mouse position
 		}
 	}
+
+	// If a body was selected we will attach a mouse joint to it
+	// so we can pull it around
+	// TODO 2: If a body was selected, create a mouse joint
+	// using mouse_joint class property
+
+
+	// TODO 3: If the player keeps pressing the mouse button, update
+	// target position and draw a red line between both anchor points
+
+	// TODO 4: If the player releases the mouse button, destroy the joint
 
 	return UPDATE_CONTINUE;
 }
@@ -387,4 +278,78 @@ bool ModulePhysics::CleanUp()
 	delete world;
 
 	return true;
+}
+
+void PhysBody::GetPosition(int& x, int &y) const
+{
+	b2Vec2 pos = body->GetPosition();
+	x = METERS_TO_PIXELS(pos.x) - (width);
+	y = METERS_TO_PIXELS(pos.y) - (height);
+}
+
+float PhysBody::GetRotation() const
+{
+	return RADTODEG * body->GetAngle();
+}
+
+bool PhysBody::Contains(int x, int y) const
+{
+	b2Vec2 p(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
+
+	const b2Fixture* fixture = body->GetFixtureList();
+
+	while(fixture != NULL)
+	{
+		if(fixture->GetShape()->TestPoint(body->GetTransform(), p) == true)
+			return true;
+		fixture = fixture->GetNext();
+	}
+
+	return false;
+}
+
+int PhysBody::RayCast(int x1, int y1, int x2, int y2, float& normal_x, float& normal_y) const
+{
+	int ret = -1;
+
+	b2RayCastInput input;
+	b2RayCastOutput output;
+
+	input.p1.Set(PIXEL_TO_METERS(x1), PIXEL_TO_METERS(y1));
+	input.p2.Set(PIXEL_TO_METERS(x2), PIXEL_TO_METERS(y2));
+	input.maxFraction = 1.0f;
+
+	const b2Fixture* fixture = body->GetFixtureList();
+
+	while(fixture != NULL)
+	{
+		if(fixture->GetShape()->RayCast(&output, input, body->GetTransform(), 0) == true)
+		{
+			// do we want the normal ?
+
+			float fx = x2 - x1;
+			float fy = y2 - y1;
+			float dist = sqrtf((fx*fx) + (fy*fy));
+
+			normal_x = output.normal.x;
+			normal_y = output.normal.y;
+
+			return output.fraction * dist;
+		}
+		fixture = fixture->GetNext();
+	}
+
+	return ret;
+}
+
+void ModulePhysics::BeginContact(b2Contact* contact)
+{
+	PhysBody* physA = (PhysBody*)contact->GetFixtureA()->GetBody()->GetUserData();
+	PhysBody* physB = (PhysBody*)contact->GetFixtureB()->GetBody()->GetUserData();
+
+	if(physA && physA->listener != NULL)
+		physA->listener->OnCollision(physA, physB);
+
+	if(physB && physB->listener != NULL)
+		physB->listener->OnCollision(physB, physA);
 }
