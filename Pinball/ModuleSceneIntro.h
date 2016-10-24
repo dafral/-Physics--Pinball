@@ -18,9 +18,6 @@ public:
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
 public:
-	//bouncy circles
-	p2List<PhysBody*> circles;
-
 	//balls available
 	p2List<PhysBody*> balls;
 
@@ -28,6 +25,8 @@ public:
 	p2List<PhysBody*> ricks;
 
 	//map
+	//bouncy circles
+	p2List<PhysBody*> circles;
 	PhysBody* map;
 	PhysBody* r_metal_piece;
 	PhysBody* l_metal_piece;
@@ -36,17 +35,32 @@ public:
 	PhysBody* r_bouncy_t; 
 	PhysBody* l_bouncy_t; 
 
-	PhysBody* sensor;
+	//sensors
+	p2List<PhysBody*> green_sensors;
+	PhysBody* loosing_sensor;
+	bool reproducing = false; //makes sure loosing sound triggers only one time
+
+	PhysBody* air_sensor;
+	PhysBody* grounded_sensor;
+
 	PhysBody* spring_box;
 	PhysBody* spring_start;
 	bool sensed;
 
+	//textures
 	SDL_Texture* circle;
 	SDL_Texture* box;
 	SDL_Texture* rick;
 	SDL_Texture* background;
 
+	//sounds
 	uint bonus_fx;
+	uint start_fx;
+	uint woob_fx;
+	uint iron_fx;
+	uint air_fx;
+	uint grounded_fx;
+
 	p2Point<int> ray;
 	bool ray_on;
 
@@ -172,4 +186,20 @@ private:
 		313, 698,
 		308, 692
 	};
+
+	int air_s[8] = {
+		108, 465,
+		118, 469,
+		87, 529,
+		79, 523
+	};
+
+	int grounded_s[6] = {
+		415, 181,
+		428, 218,
+		417, 230
+	};
+
+
+
 };

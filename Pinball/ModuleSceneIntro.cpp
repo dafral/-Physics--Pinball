@@ -30,6 +30,11 @@ bool ModuleSceneIntro::Start()
 	box = App->textures->Load("pinball/crate.png");
 	rick = App->textures->Load("pinball/rick_head.png");
 	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");
+	start_fx = App->audio->LoadFx("pinball/start.wav");
+	iron_fx = App->audio->LoadFx("pinball/iron.wav");
+	woob_fx = App->audio->LoadFx("pinball/woob.wav");
+	air_fx = App->audio->LoadFx("pinball/air.wav");
+	grounded_fx = App->audio->LoadFx("pinball/grounded.wav");
 
 	
 	/*spring_box = App->physics->CreateRectangle(438, 680, 10, 5);
@@ -44,7 +49,30 @@ bool ModuleSceneIntro::Start()
 
 	b2RopeJoint* spring_joint = (b2RopeJoint*)world->CreateJoint(&spring_jointDef);*/
 
-	sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
+	//sensors
+	loosing_sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
+	loosing_sensor->listener = this;
+
+	air_sensor = App->physics->CreateChain(0, 0, air_s, 8);
+	air_sensor->body->GetFixtureList()->SetSensor(true);
+	air_sensor->body->SetType(b2_staticBody);
+	air_sensor->listener = this;
+
+	green_sensors.add(App->physics->CreateCircle(152, 97, 4));
+	green_sensors.add(App->physics->CreateCircle(173, 74, 7));
+	green_sensors.add(App->physics->CreateCircle(201, 61, 10));
+	green_sensors.add(App->physics->CreateCircle(237, 49, 12));
+
+	for (p2List_item<PhysBody*>* bc = green_sensors.getFirst(); bc != NULL; bc = bc->next) {
+		bc->data->body->SetType(b2_staticBody);
+		bc->data->body->GetFixtureList()->SetSensor(true);
+		bc->data->listener = this;
+	}
+
+	grounded_sensor = App->physics->CreateChain(0, 0, grounded_s, 6);
+	grounded_sensor->body->GetFixtureList()->SetSensor(true);
+	grounded_sensor->body->SetType(b2_staticBody);
+	grounded_sensor->listener = this;
 
 	map = App->physics->CreateChain(0, 0, map_points, 148);
 	map->body->SetType(b2_staticBody);
@@ -64,10 +92,12 @@ bool ModuleSceneIntro::Start()
 	r_bouncy_t = App->physics->CreateChain(0, 0, r_bouncy_tr, 8);
 	r_bouncy_t->body->SetType(b2_staticBody);
 	r_bouncy_t->body->GetFixtureList()->SetRestitution(4.0f);
+	r_bouncy_t->listener = this;
 
 	l_bouncy_t = App->physics->CreateChain(0, 0, l_bouncy_tr, 8);
 	l_bouncy_t->body->SetType(b2_staticBody);
 	l_bouncy_t->body->GetFixtureList()->SetRestitution(4.0f);
+	l_bouncy_t->listener = this;
 
 	circles.add(App->physics->CreateCircle(269, 213, 27));
 	circles.add(App->physics->CreateCircle(206, 286, 27));
@@ -76,14 +106,13 @@ bool ModuleSceneIntro::Start()
 	for (p2List_item<PhysBody*>* bc = circles.getFirst(); bc != NULL; bc = bc->next) {
 		bc->data->body->SetType(b2_staticBody);
 		bc->data->body->GetFixtureList()->SetRestitution(1.3f);
+		bc->data->listener = this;
 	}
 
 	balls.add(App->physics->CreateCircle(434, 651, 8));
-	balls.getLast()->data->listener = this;
 	balls.getLast()->data->body->SetFixedRotation(true);
 	balls.getLast()->data->body->GetFixtureList()->SetRestitution(0.3f);
 
-	//circles.getLast()->data->listener = this;
 
 	/*b2World* world;
 	b2BodyDef spring_box;
@@ -147,7 +176,7 @@ update_status ModuleSceneIntro::Update()
 	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
 	{
 		circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 8));
-		circles.getLast()->data->listener = this;
+		//circles.getLast()->data->listener = this;
 	}
 
 	if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
@@ -263,10 +292,33 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
 	int x, y;
 
-	App->audio->PlayFx(bonus_fx);
-	
+	if (bodyA == r_bouncy_t || bodyA == l_bouncy_t)
+		App->audio->PlayFx(iron_fx);
 
-	
+	else if (bodyA == loosing_sensor && reproducing == false) {
+		App->audio->PlayFx(start_fx);
+		reproducing = true;
+	}
+
+	else if (bodyA == air_sensor)
+		App->audio->PlayFx(air_fx);
+
+	else if (bodyA == grounded_sensor)
+		App->audio->PlayFx(grounded_fx);
+
+	else {
+		for (p2List_item<PhysBody*>* bc = green_sensors.getFirst(); bc != NULL; bc = bc->next) {
+			if (bc->data == bodyA)
+				App->audio->PlayFx(woob_fx);
+		}
+
+		for (p2List_item<PhysBody*>* bc = circles.getFirst(); bc != NULL; bc = bc->next) {
+			if (bc->data == bodyA)
+				App->audio->PlayFx(iron_fx);
+		}
+		
+	}
+
 	if(bodyA)
 	{
 		bodyA->GetPosition(x, y);
