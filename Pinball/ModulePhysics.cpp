@@ -169,6 +169,7 @@ bool ModulePhysics::Start()
 
 	spring_box = App->physics->CreateRectangle(438, 675, 12, 12);
 	spring_box->body->SetType(b2_dynamicBody);
+	spring_box->body->SetFixedRotation(true);
 
 	spring_start = App->physics->CreateRectangle(438, 698, 12, 12);
 	spring_start->body->SetType(b2_staticBody);
@@ -179,7 +180,7 @@ bool ModulePhysics::Start()
 	spring_jointDef.bodyB = spring_box->body;
 	spring_jointDef.collideConnected = false;
 	spring_jointDef.length = PIXEL_TO_METERS(50);
-	spring_jointDef.dampingRatio = 0.25f;
+	spring_jointDef.dampingRatio = 1.0f;
 	spring_jointDef.frequencyHz = 25.0;
 
 	spring_joint = (b2DistanceJoint*)world->CreateJoint(&spring_jointDef);
@@ -345,7 +346,7 @@ update_status ModulePhysics::PostUpdate()
 	}
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT)
-		spring_box->body->ApplyForce(b2Vec2(0, 1000), spring_box->body->GetWorldCenter(), false);
+		spring_box->body->ApplyForce(b2Vec2(0, 800), spring_box->body->GetWorldCenter(), true);
 
 	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
 		debug = !debug;

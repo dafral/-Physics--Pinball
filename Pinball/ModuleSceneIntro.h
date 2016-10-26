@@ -20,7 +20,7 @@ public:
 public:
 	//balls available
 	PhysBody* ball;
-	uint balls = 3;
+	int balls = 4;
 
 	uint score = 0;
 
@@ -31,7 +31,6 @@ public:
 	//bouncy circles
 	p2List<PhysBody*> circles;
 	p2List<PhysBody*> carts;
-	
 
 	PhysBody* map;
 	PhysBody* r_metal_piece;
@@ -40,13 +39,13 @@ public:
 	PhysBody* l_triangle;
 	PhysBody* r_bouncy_t; 
 	PhysBody* l_bouncy_t; 
-
+	PhysBody* must_destroy = nullptr;
 	
 
 	//sensors
 	p2List<PhysBody*> green_sensors;
 	PhysBody* loosing_sensor;
-	bool reproducing = false; //makes sure loosing sound triggers only one time
+	bool lost = false;
 
 	PhysBody* air_sensor;
 	PhysBody* grounded_sensor;
@@ -61,7 +60,7 @@ public:
 	SDL_Texture* bouncer_kicked;
 	SDL_Texture* left_kicker;
 	SDL_Texture* right_kicker;
-	SDL_Texture* Ball;
+	SDL_Texture* broken_box;
 
 	//sounds
 	uint bonus_fx;
@@ -209,7 +208,9 @@ private:
 		428, 218,
 		417, 230
 	};
-	
+
+
+
 
 
 };
