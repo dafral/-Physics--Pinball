@@ -174,11 +174,6 @@ update_status ModuleSceneIntro::Update()
 			ball->body->SetFixedRotation(true);
 			ball->body->GetFixtureList()->SetRestitution(0.2f);
 		}
-
-		if (balls = 0) {
-			score = 0;
-			balls = 4;
-		}
 	}
 
 	// Prepare for raycast ------------------------------------------------------
