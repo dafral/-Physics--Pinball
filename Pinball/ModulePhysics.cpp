@@ -123,7 +123,7 @@ bool ModulePhysics::Start()
 
 	//Creating right kicker
 	uint x_rk = 240;
-	uint y_rk = 725;
+	uint y_rk = 720;
 	uint width_rk = 60;
 	uint height_rk = 14;
 

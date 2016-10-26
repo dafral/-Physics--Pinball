@@ -29,22 +29,22 @@ bool ModuleSceneIntro::Start()
 
 	
 	//art
-	background = App->textures->Load("pinball/background_without_kickers.png");
-	circle = App->textures->Load("pinball/wheel.png");
-	box = App->textures->Load("pinball/crate.png");
-	rick = App->textures->Load("pinball/rick_head.png");
-	left_kicker = App->textures->Load("pinball/Left_kicker.png");
-	right_kicker = App->textures->Load("pinball/Right_kicker.png");
-	bouncer_kicked = App->textures->Load("pinball/bouncer_kicked.png");
-	Ball = App->textures->Load("pinball/Ball.png");
+	background = App->textures->Load("Game/pinball/background_without_kickers.png");
+	circle = App->textures->Load("Game/pinball/wheel.png");
+	box = App->textures->Load("Game/pinball/crate.png");
+	rick = App->textures->Load("Game/pinball/rick_head.png");
+	left_kicker = App->textures->Load("Game/pinball/Left_kicker.png");
+	right_kicker = App->textures->Load("Game/pinball/Right_kicker.png");
+	bouncer_kicked = App->textures->Load("Game/pinball/bouncer_kicked.png");
+	Ball = App->textures->Load("Game/pinball/Ball.png");
 
 	//fx
-	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");
-	start_fx = App->audio->LoadFx("pinball/start.wav");
-	iron_fx = App->audio->LoadFx("pinball/iron.wav");
-	woob_fx = App->audio->LoadFx("pinball/woob.wav");
-	air_fx = App->audio->LoadFx("pinball/air.wav");
-	grounded_fx = App->audio->LoadFx("pinball/grounded.wav");
+	bonus_fx = App->audio->LoadFx("Game/pinball/bonus.wav");
+	start_fx = App->audio->LoadFx("Game/pinball/start.wav");
+	iron_fx = App->audio->LoadFx("Game/pinball/iron.wav");
+	woob_fx = App->audio->LoadFx("Game/pinball/woob.wav");
+	air_fx = App->audio->LoadFx("Game/pinball/air.wav");
+	grounded_fx = App->audio->LoadFx("Game/pinball/grounded.wav");
 
 	
 	//sensors
