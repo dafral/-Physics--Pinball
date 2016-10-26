@@ -50,12 +50,21 @@ public:
 
 	// b2ContactListener ---
 	void BeginContact(b2Contact* contact);
-public:
-	
+
+	b2Body* stick_left_body;
+	b2Body* stick_right_body;
+
+	float left_rotation = 0;
+	float right_rotation = 0;
 
 private:
 	bool debug;
 	b2World* world;
 	b2MouseJoint* mouse_joint;
 	b2Body* ground;
+
+	b2RevoluteJoint* l_joint;
+	b2RevoluteJoint* r_joint;
+	PhysBody* l_kicker;
+	PhysBody* r_kicker;
 };

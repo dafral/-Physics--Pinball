@@ -30,6 +30,8 @@ public:
 	//map
 	//bouncy circles
 	p2List<PhysBody*> circles;
+	p2List<PhysBody*> carts;
+
 	PhysBody* map;
 	PhysBody* r_metal_piece;
 	PhysBody* l_metal_piece;
@@ -37,6 +39,7 @@ public:
 	PhysBody* l_triangle;
 	PhysBody* r_bouncy_t; 
 	PhysBody* l_bouncy_t; 
+	
 
 	//sensors
 	p2List<PhysBody*> green_sensors;

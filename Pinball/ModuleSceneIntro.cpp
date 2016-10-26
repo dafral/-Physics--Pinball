@@ -71,6 +71,15 @@ bool ModuleSceneIntro::Start()
 		bc->data->listener = this;
 	}
 
+	carts.add(App->physics->CreateRectangle(70, 210, 29, 21));
+	carts.add(App->physics->CreateRectangle(60, 190, 29, 21));
+	carts.add(App->physics->CreateRectangle(50, 170, 29, 21));
+
+	for (p2List_item<PhysBody*>* bc = carts.getFirst(); bc != NULL; bc = bc->next) {
+		bc->data->body->SetType(b2_staticBody);
+		bc->data->listener = this;
+	}
+
 	grounded_sensor = App->physics->CreateChain(0, 0, grounded_s, 6);
 	grounded_sensor->body->GetFixtureList()->SetSensor(true);
 	grounded_sensor->body->SetType(b2_staticBody);
@@ -194,6 +203,16 @@ update_status ModuleSceneIntro::Update()
 		ball->body->ApplyLinearImpulse(b2Vec2(0, -5), ball->body->GetWorldCenter(), false);
 	}
 
+	if (App->input->GetKey(SDL_SCANCODE_Z) == KEY_DOWN)
+	{
+		App->physics->stick_left_body->ApplyLinearImpulse(b2Vec2(0, -5), App->physics->stick_left_body->GetWorldCenter(), false);
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_M) == KEY_DOWN)
+	{
+		App->physics->stick_right_body->ApplyLinearImpulse(b2Vec2(0, -20), App->physics->stick_right_body->GetWorldCenter(), true);
+	}
+
 	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
 	{
 		circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 8));
@@ -262,7 +281,7 @@ update_status ModuleSceneIntro::Update()
 	{
 		int x, y;
 		c->data->GetPosition(x, y);
-		if(c->data->Contains(App->input->GetMouseX(), App->input->GetMouseY()))
+		//if(c->data->Contains(App->input->GetMouseX(), App->input->GetMouseY()))
 			App->renderer->Blit(circle, x, y, NULL, 1.0f, c->data->GetRotation());
 		c = c->next;
 	}
@@ -346,6 +365,13 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			if (bc->data == bodyA) {
 				App->audio->PlayFx(iron_fx);
 				score += 10;
+			}
+		}
+
+		for (p2List_item<PhysBody*>* bc = carts.getFirst(); bc != NULL; bc = bc->next) {
+			if (bc->data == bodyA) {
+				//bc->data->body->GetFixtureList()->SetSensor(true);
+				score += 500;
 			}
 		}
 		
