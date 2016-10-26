@@ -35,6 +35,7 @@ bool ModuleSceneIntro::Start()
 	left_kicker = App->textures->Load("pinball/Left_kicker.png");
 	right_kicker = App->textures->Load("pinball/Right_kicker.png");
 	bouncer_kicked = App->textures->Load("pinball/bouncer_kicked.png");
+	broken_box = App->textures->Load("pinball/broken_box.png");
 
 	//fx
 	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");
@@ -153,24 +154,31 @@ update_status ModuleSceneIntro::Update()
 
 	App->window->SetTitle(title);
 
+	//crates collision destruction
 	if (must_destroy != nullptr) {
+		int x, y;
+		must_destroy->GetPosition(x, y);
+		App->renderer->Blit(broken_box, x, y, NULL, 1.0f, NULL);
 		must_destroy->body->SetActive(false);
 		must_destroy = nullptr;
 	}
 
 	//new ball generated if you have enough balls
-	if (lost == true && balls > 0) {
+	if (lost == true) {
 		ball->body->SetActive(false);
 		lost = false;
 
-		ball = App->physics->CreateCircle(434, 600, 8);
-		balls++;
-		ball->body->SetFixedRotation(true);
-		ball->body->GetFixtureList()->SetRestitution(0.3f);
+		balls--;
+
+		if (balls > 0) {
+			ball = App->physics->CreateCircle(434, 630, 8);
+			ball->body->SetFixedRotation(true);
+			ball->body->GetFixtureList()->SetRestitution(0.3f);
+		}
 	}
 
 
-	//App->renderer->Blit(bouncer_kicked, x, y, NULL, 1.0f, NULL);
+
 
 	
 	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
@@ -257,7 +265,6 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 
 	else if (bodyA == loosing_sensor) {
 		App->audio->PlayFx(start_fx);
-		balls--;
 		lost = true;
 
 	}

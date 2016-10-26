@@ -20,7 +20,7 @@ public:
 public:
 	//balls available
 	PhysBody* ball;
-	uint balls = 3;
+	int balls = 4;
 
 	uint score = 0;
 
@@ -60,6 +60,7 @@ public:
 	SDL_Texture* bouncer_kicked;
 	SDL_Texture* left_kicker;
 	SDL_Texture* right_kicker;
+	SDL_Texture* broken_box;
 
 	//sounds
 	uint bonus_fx;
@@ -207,6 +208,8 @@ private:
 		428, 218,
 		417, 230
 	};
+
+
 
 
 
