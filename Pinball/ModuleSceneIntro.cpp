@@ -28,14 +28,14 @@ bool ModuleSceneIntro::Start()
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
 	//art
-	background = App->textures->Load("pinball/background_without_kickers.png");
+	background = App->textures->Load("Game/pinball/background_without_kickers.png");
 	circle = App->textures->Load("pinball/wheel.png"); 
 	box = App->textures->Load("pinball/crate.png");
 	rick = App->textures->Load("pinball/rick_head.png");
-	left_kicker = App->textures->Load("pinball/Left_kicker.png");
-	right_kicker = App->textures->Load("pinball/Right_kicker.png");
-	bouncer_kicked = App->textures->Load("pinball/bouncer_kicked.png");
-	Ball = App->textures->Load("pinball/Ball.png");
+	left_kicker = App->textures->Load("Game/pinball/Left_kicker.png");
+	right_kicker = App->textures->Load("Game/pinball/Right_kicker.png");
+	bouncer_kicked = App->textures->Load("Game/pinball/bouncer_kicked.png");
+	Ball = App->textures->Load("Game/pinball/Ball.png");
 
 
 	//fx
