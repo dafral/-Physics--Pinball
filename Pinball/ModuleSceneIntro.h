@@ -39,6 +39,7 @@ public:
 	PhysBody* l_triangle;
 	PhysBody* r_bouncy_t; 
 	PhysBody* l_bouncy_t; 
+	PhysBody* must_destroy = nullptr;
 	
 
 	//sensors
