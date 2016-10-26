@@ -1,17 +1,13 @@
 // Pivot -1, -2
-int background_without_kickers[10] = {
-	168, 98,
-	184, 91,
-	204, 131,
-	187, 139,
-	168, 98
+int background_without_kickers[6] = {
+	415, 181,
+	428, 218,
+	417, 230
 };
 
 // Pivot -0.002000, -0.002427
-float background_without_kickers[10] = {
-	0.336000f, 0.118932f,
-	0.368000f, 0.110437f,
-	0.408000f, 0.158981f,
-	0.374000f, 0.168689f,
-	0.336000f, 0.118932f
+float background_without_kickers[6] = {
+	0.830000f, 0.219660f,
+	0.856000f, 0.264563f,
+	0.834000f, 0.279126f
 };
