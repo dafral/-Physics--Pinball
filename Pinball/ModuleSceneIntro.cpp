@@ -35,6 +35,8 @@ bool ModuleSceneIntro::Start()
 	left_kicker = App->textures->Load("pinball/Left_kicker.png");
 	right_kicker = App->textures->Load("pinball/Right_kicker.png");
 	bouncer_kicked = App->textures->Load("pinball/bouncer_kicked.png");
+	Ball = App->textures->Load("pinball/Ball.png");
+
 
 	//fx
 	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");
@@ -46,7 +48,7 @@ bool ModuleSceneIntro::Start()
 
 	
 	//sensors
-	loosing_sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, 865, SCREEN_WIDTH, 50);
+	loosing_sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
 	loosing_sensor->listener = this;
 
 	air_sensor = App->physics->CreateChain(0, 0, air_s, 8);
@@ -71,7 +73,6 @@ bool ModuleSceneIntro::Start()
 
 	for (p2List_item<PhysBody*>* bc = carts.getFirst(); bc != NULL; bc = bc->next) {
 		bc->data->body->SetType(b2_staticBody);
-		//bc->data->body->SetActive(false);
 		bc->data->listener = this;
 	}
 
@@ -82,6 +83,8 @@ bool ModuleSceneIntro::Start()
 
 	map = App->physics->CreateChain(0, 0, map_points, 148);
 	map->body->SetType(b2_staticBody);
+
+	
 
 	r_metal_piece = App->physics->CreateChain(0, 0, r_metal, 12);
 	r_metal_piece->body->SetType(b2_staticBody);
@@ -116,7 +119,7 @@ bool ModuleSceneIntro::Start()
 	}
 
 	//game ball
-	ball = App->physics->CreateCircle(434, 600, 8);
+	ball = App->physics->CreateCircle(434, 651, 8);
 	ball->body->SetFixedRotation(true);
 	ball->body->GetFixtureList()->SetRestitution(0.3f);
 	
@@ -153,33 +156,68 @@ update_status ModuleSceneIntro::Update()
 
 	App->window->SetTitle(title);
 
-	if (must_destroy != nullptr) {
-		must_destroy->body->SetActive(false);
-		must_destroy = nullptr;
-	}
-
-	//new ball generated if you have enough balls
-	if (lost == true && balls > 0) {
-		ball->body->SetActive(false);
-		lost = false;
-
-		ball = App->physics->CreateCircle(434, 600, 8);
-		balls++;
-		ball->body->SetFixedRotation(true);
-		ball->body->GetFixtureList()->SetRestitution(0.3f);
-	}
-
-
 	//App->renderer->Blit(bouncer_kicked, x, y, NULL, 1.0f, NULL);
 
-	
+	if(App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
+	{
+		/*ray_on = !ray_on;
+		ray.x = App->input->GetMouseX();
+		ray.y = App->input->GetMouseY();*/
+		
+		//ball->body->ApplyLinearImpulse(b2Vec2(0, -5), ball->body->GetWorldCenter(), false);
+	}
+
 	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
 	{
 		circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 8));
 		//circles.getLast()->data->listener = this;
 	}
 
-	
+	if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
+	{
+		boxes.add(App->physics->CreateRectangle(App->input->GetMouseX(), App->input->GetMouseY(), 100, 50));
+	}
+
+	if(App->input->GetKey(SDL_SCANCODE_3) == KEY_DOWN)
+	{
+		// Pivot 0, 0
+		int rick_head[64] = {
+			14, 36,
+			42, 40,
+			40, 0,
+			75, 30,
+			88, 4,
+			94, 39,
+			111, 36,
+			104, 58,
+			107, 62,
+			117, 67,
+			109, 73,
+			110, 85,
+			106, 91,
+			109, 99,
+			103, 104,
+			100, 115,
+			106, 121,
+			103, 125,
+			98, 126,
+			95, 137,
+			83, 147,
+			67, 147,
+			53, 140,
+			46, 132,
+			34, 136,
+			38, 126,
+			23, 123,
+			30, 114,
+			10, 102,
+			29, 90,
+			0, 75,
+			30, 62
+		};
+
+		ricks.add(App->physics->CreateChain(App->input->GetMouseX(), App->input->GetMouseY(), rick_head, 64));
+	}
 
 	// Prepare for raycast ------------------------------------------------------
 	
@@ -230,7 +268,15 @@ update_status ModuleSceneIntro::Update()
 
 	int x, y;
 	App->physics->r_kicker->GetPosition(x, y);
-	App->renderer->Blit(right_kicker, x, y, NULL, 1.0f, App->physics->r_kicker->GetRotation());
+	App->renderer->Blit(right_kicker, x+10, y-15, NULL, 1.0f, App->physics->r_kicker->GetRotation()+35);
+
+	int i, j;
+	ball->GetPosition(i, j);
+	App->renderer->Blit(Ball, i, j, NULL, 1.0f, ball->GetRotation());
+
+	int d, r;
+	App->physics->l_kicker->GetPosition(d, r);
+	App->renderer->Blit(left_kicker, d-15, r-25, NULL, 1.0f, App->physics->l_kicker->GetRotation()-35);
 
 	// ray -----------------
 	if(ray_on == true)
@@ -255,10 +301,11 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	if (bodyA == r_bouncy_t || bodyA == l_bouncy_t)
 		App->audio->PlayFx(iron_fx);
 
-	else if (bodyA == loosing_sensor) {
+	else if (bodyA == loosing_sensor && reproducing == false) {
 		App->audio->PlayFx(start_fx);
+		reproducing = true;
 		balls--;
-		lost = true;
+		
 
 	}
 
@@ -292,7 +339,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 
 		for (p2List_item<PhysBody*>* bc = carts.getFirst(); bc != NULL; bc = bc->next) {
 			if (bc->data == bodyA) {
-				must_destroy = bc->data;
+				//bc->data->body->GetFixtureList()->SetSensor(true);
 				score += 500;
 			}
 		}
