@@ -51,8 +51,15 @@ public:
 	// b2ContactListener ---
 	void BeginContact(b2Contact* contact);
 
-	b2Body* stick_left_body;
-	b2Body* stick_right_body;
+	b2Body* kicker_left_body;
+	b2Body* kicker_right_body;
+
+	PhysBody* l_kicker;
+	PhysBody* r_kicker;
+
+	PhysBody* spring_box;
+	PhysBody* spring_start;
+
 
 	float left_rotation = 0;
 	float right_rotation = 0;
@@ -63,8 +70,8 @@ private:
 	b2MouseJoint* mouse_joint;
 	b2Body* ground;
 
+	b2DistanceJoint* spring_joint;
 	b2RevoluteJoint* l_joint;
 	b2RevoluteJoint* r_joint;
-	PhysBody* l_kicker;
-	PhysBody* r_kicker;
+	
 };

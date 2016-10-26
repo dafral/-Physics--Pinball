@@ -85,12 +85,12 @@ bool ModulePhysics::Start()
 	l_kicker->height = height_lk * 0.5f;
 
 	// Set Left Joint bodies
-	stick_left_body = world->CreateBody(&body_l);
+	kicker_left_body = world->CreateBody(&body_l);
 
 	// Set Left Joint
 
 	b2RevoluteJointDef joint_left_def;
-	joint_left_def.bodyA = App->physics->stick_left_body;
+	joint_left_def.bodyA = App->physics->kicker_left_body;
 	joint_left_def.bodyB = l_kicker->body;
 	joint_left_def.collideConnected = true;
 	joint_left_def.localAnchorA.Set(PIXEL_TO_METERS(0), 0);
@@ -150,12 +150,12 @@ bool ModulePhysics::Start()
 
 
 	// Set Right Joint bodies
-	stick_right_body = world->CreateBody(&body_r);
+	kicker_right_body = world->CreateBody(&body_r);
 
 	// Set Right Joint
 
 	b2RevoluteJointDef joint_right_def;
-	joint_right_def.bodyA = App->physics->stick_right_body;
+	joint_right_def.bodyA = App->physics->kicker_right_body;
 	joint_right_def.bodyB = r_kicker->body;
 	joint_right_def.collideConnected = true;
 	joint_right_def.localAnchorA.Set(PIXEL_TO_METERS(0), 0);
@@ -166,6 +166,24 @@ bool ModulePhysics::Start()
 	joint_right_def.upperAngle = 42 * DEGTORAD;
 	joint_right_def.enableMotor = true;
 	r_joint = (b2RevoluteJoint*)world->CreateJoint(&joint_right_def);
+
+	spring_box = App->physics->CreateRectangle(438, 675, 12, 12);
+	spring_box->body->SetType(b2_dynamicBody);
+
+	spring_start = App->physics->CreateRectangle(438, 698, 12, 12);
+	spring_start->body->SetType(b2_staticBody);
+
+
+	b2DistanceJointDef spring_jointDef;
+	spring_jointDef.bodyA = spring_start->body;
+	spring_jointDef.bodyB = spring_box->body;
+	spring_jointDef.collideConnected = false;
+	spring_jointDef.length = PIXEL_TO_METERS(50);
+	spring_jointDef.dampingRatio = 0.25f;
+	spring_jointDef.frequencyHz = 25.0;
+
+	spring_joint = (b2DistanceJoint*)world->CreateJoint(&spring_jointDef);
+
 	
 	return true;
 }
@@ -325,6 +343,9 @@ update_status ModulePhysics::PostUpdate()
 		r_joint->SetMaxMotorTorque(720);
 		r_joint->SetMotorSpeed(22);
 	}
+
+	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT)
+		spring_box->body->ApplyForce(b2Vec2(0, 1000), spring_box->body->GetWorldCenter(), false);
 
 	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
 		debug = !debug;

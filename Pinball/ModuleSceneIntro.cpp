@@ -27,10 +27,16 @@ bool ModuleSceneIntro::Start()
 
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
+	//art
 	background = App->textures->Load("pinball/background_without_kickers.png");
 	circle = App->textures->Load("pinball/wheel.png"); 
 	box = App->textures->Load("pinball/crate.png");
 	rick = App->textures->Load("pinball/rick_head.png");
+	left_kicker = App->textures->Load("pinball/Left_kicker.png");
+	right_kicker = App->textures->Load("pinball/Right_kicker.png");
+	bouncer_kicked = App->textures->Load("pinball/bouncer_kicked.png");
+
+	//fx
 	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");
 	start_fx = App->audio->LoadFx("pinball/start.wav");
 	iron_fx = App->audio->LoadFx("pinball/iron.wav");
@@ -39,18 +45,6 @@ bool ModuleSceneIntro::Start()
 	grounded_fx = App->audio->LoadFx("pinball/grounded.wav");
 
 	
-	/*spring_box = App->physics->CreateRectangle(438, 680, 10, 5);
-	spring_box->body->SetType(b2_staticBody);
-	spring_start = App->physics->CreateRectangle(438, 698, 10, 5);
-	spring_start->body->SetType(b2_staticBody);
-
-	b2RopeJointDef spring_jointDef;
-	spring_jointDef.bodyA = spring_box;
-	spring_jointDef.bodyB = spring_start;
-	spring_jointDef.maxLength = 5;
-
-	b2RopeJoint* spring_joint = (b2RopeJoint*)world->CreateJoint(&spring_jointDef);*/
-
 	//sensors
 	loosing_sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
 	loosing_sensor->listener = this;
@@ -125,41 +119,6 @@ bool ModuleSceneIntro::Start()
 	ball->body->SetFixedRotation(true);
 	ball->body->GetFixtureList()->SetRestitution(0.3f);
 	
-
-
-	/*b2World* world;
-	b2BodyDef spring_box;
-
-	spring_box.type = b2_dynamicBody;
-	spring_box.position.Set(PIXEL_TO_METERS(438), PIXEL_TO_METERS(680));
-
-	b2Body* myBodyA = world->CreateBody(&spring_box);
-	b2PolygonShape Spring_Box;
-	Spring_Box.SetAsBox(PIXEL_TO_METERS(8), PIXEL_TO_METERS(5));
-
-	b2FixtureDef spring_fixture;
-	spring_fixture.shape = &Spring_Box;
-	myBodyA->CreateFixture(&spring_fixture);
-
-	b2BodyDef spring_start;
-
-	spring_start.type = b2_staticBody;
-	spring_start.position.Set(PIXEL_TO_METERS(438), PIXEL_TO_METERS(698));
-
-	b2Body* myBodyB = world->CreateBody(&spring_start);
-	b2PolygonShape Spring_Start;
-	Spring_Start.SetAsBox(PIXEL_TO_METERS(8), PIXEL_TO_METERS(5));
-
-	b2FixtureDef spring_st_fixture;
-	spring_st_fixture.shape = &Spring_Start;
-	myBodyB->CreateFixture(&spring_st_fixture);
-
-	b2RopeJointDef spring_jointDef;
-	spring_jointDef.bodyA = myBodyA;
-	spring_jointDef.bodyB = myBodyB;
-	spring_jointDef.maxLength = 5;
-
-	b2RopeJoint* spring_joint = (b2RopeJoint*)world->CreateJoint(&spring_jointDef);*/
 	return ret;
 }
 
@@ -193,6 +152,7 @@ update_status ModuleSceneIntro::Update()
 
 	App->window->SetTitle(title);
 
+	//App->renderer->Blit(bouncer_kicked, x, y, NULL, 1.0f, NULL);
 
 	if(App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 	{
@@ -200,17 +160,7 @@ update_status ModuleSceneIntro::Update()
 		ray.x = App->input->GetMouseX();
 		ray.y = App->input->GetMouseY();*/
 		
-		ball->body->ApplyLinearImpulse(b2Vec2(0, -5), ball->body->GetWorldCenter(), false);
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_Z) == KEY_DOWN)
-	{
-		App->physics->stick_left_body->ApplyLinearImpulse(b2Vec2(0, -5), App->physics->stick_left_body->GetWorldCenter(), false);
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_M) == KEY_DOWN)
-	{
-		App->physics->stick_right_body->ApplyLinearImpulse(b2Vec2(0, -20), App->physics->stick_right_body->GetWorldCenter(), true);
+		//ball->body->ApplyLinearImpulse(b2Vec2(0, -5), ball->body->GetWorldCenter(), false);
 	}
 
 	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
@@ -312,6 +262,10 @@ update_status ModuleSceneIntro::Update()
 		c = c->next;
 	}
 
+	int x, y;
+	App->physics->r_kicker->GetPosition(x, y);
+	App->renderer->Blit(right_kicker, x, y, NULL, 1.0f, App->physics->r_kicker->GetRotation());
+
 	// ray -----------------
 	if(ray_on == true)
 	{
@@ -364,6 +318,9 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		for (p2List_item<PhysBody*>* bc = circles.getFirst(); bc != NULL; bc = bc->next) {
 			if (bc->data == bodyA) {
 				App->audio->PlayFx(iron_fx);
+				int x, y;
+				bc->data->GetPosition(x, y);
+				App->renderer->Blit(bouncer_kicked, x, y, NULL, 1.0f, NULL);				
 				score += 10;
 			}
 		}

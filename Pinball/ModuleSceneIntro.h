@@ -49,8 +49,6 @@ public:
 	PhysBody* air_sensor;
 	PhysBody* grounded_sensor;
 
-	PhysBody* spring_box;
-	PhysBody* spring_start;
 	bool sensed;
 
 	//textures
@@ -58,6 +56,9 @@ public:
 	SDL_Texture* box;
 	SDL_Texture* rick;
 	SDL_Texture* background;
+	SDL_Texture* bouncer_kicked;
+	SDL_Texture* left_kicker;
+	SDL_Texture* right_kicker;
 
 	//sounds
 	uint bonus_fx;
