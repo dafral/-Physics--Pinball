@@ -1,0 +1,13 @@
+// Pivot -1, -2
+int background_without_kickers[6] = {
+	415, 181,
+	428, 218,
+	417, 230
+};
+
+// Pivot -0.002000, -0.002427
+float background_without_kickers[6] = {
+	0.830000f, 0.219660f,
+	0.856000f, 0.264563f,
+	0.834000f, 0.279126f
+};

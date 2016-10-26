@@ -16,7 +16,7 @@ ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app,
 {
 	world = NULL;
 	mouse_joint = NULL;
-	debug = true;
+	debug = false;
 }
 
 // Destructor
@@ -347,9 +347,6 @@ update_status ModulePhysics::PostUpdate()
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT)
 		spring_box->body->ApplyForce(b2Vec2(0, 800), spring_box->body->GetWorldCenter(), true);
-
-	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
-		debug = !debug;
 
 	if(!debug)
 		return UPDATE_CONTINUE;

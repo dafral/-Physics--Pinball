@@ -29,22 +29,20 @@ bool ModuleSceneIntro::Start()
 
 	
 	//art
-	background = App->textures->Load("Game/pinball/background_without_kickers.png");
-	circle = App->textures->Load("Game/pinball/wheel.png");
-	box = App->textures->Load("Game/pinball/crate.png");
-	rick = App->textures->Load("Game/pinball/rick_head.png");
-	left_kicker = App->textures->Load("Game/pinball/Left_kicker.png");
-	right_kicker = App->textures->Load("Game/pinball/Right_kicker.png");
-	bouncer_kicked = App->textures->Load("Game/pinball/bouncer_kicked.png");
-	Ball = App->textures->Load("Game/pinball/Ball.png");
+	background = App->textures->Load("pinball/background_without_kickers.png");
+	circle = App->textures->Load("pinball/wheel.png");
+	left_kicker = App->textures->Load("pinball/Left_kicker.png");
+	right_kicker = App->textures->Load("pinball/Right_kicker.png");
+	bouncer_kicked = App->textures->Load("pinball/bouncer_kicked.png");
+	Ball = App->textures->Load("pinball/Ball.png");
 
 	//fx
-	bonus_fx = App->audio->LoadFx("Game/pinball/bonus.wav");
-	start_fx = App->audio->LoadFx("Game/pinball/start.wav");
-	iron_fx = App->audio->LoadFx("Game/pinball/iron.wav");
-	woob_fx = App->audio->LoadFx("Game/pinball/woob.wav");
-	air_fx = App->audio->LoadFx("Game/pinball/air.wav");
-	grounded_fx = App->audio->LoadFx("Game/pinball/grounded.wav");
+	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");
+	start_fx = App->audio->LoadFx("pinball/start.wav");
+	iron_fx = App->audio->LoadFx("pinball/iron.wav");
+	woob_fx = App->audio->LoadFx("pinball/woob.wav");
+	air_fx = App->audio->LoadFx("pinball/air.wav");
+	grounded_fx = App->audio->LoadFx("pinball/grounded.wav");
 
 	
 	//sensors
@@ -176,22 +174,12 @@ update_status ModuleSceneIntro::Update()
 			ball->body->SetFixedRotation(true);
 			ball->body->GetFixtureList()->SetRestitution(0.2f);
 		}
+
+		if (balls = 0) {
+			score = 0;
+			balls = 4;
+		}
 	}
-
-
-
-
-	
-	if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
-	{
-		circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 8));
-		//circles.getLast()->data->listener = this;
-	}
-
-	
-	
-
-	
 
 	// Prepare for raycast ------------------------------------------------------
 	
@@ -209,8 +197,7 @@ update_status ModuleSceneIntro::Update()
 	{
 		int x, y;
 		c->data->GetPosition(x, y);
-		//if(c->data->Contains(App->input->GetMouseX(), App->input->GetMouseY()))
-			App->renderer->Blit(circle, x, y, NULL, 1.0f, c->data->GetRotation());
+		App->renderer->Blit(circle, x, y, NULL, 1.0f, c->data->GetRotation());
 		c = c->next;
 	}
 
@@ -227,16 +214,6 @@ update_status ModuleSceneIntro::Update()
 			if(hit >= 0)
 				ray_hit = hit;
 		}
-		c = c->next;
-	}
-
-	c = ricks.getFirst();
-
-	while(c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		App->renderer->Blit(rick, x, y, NULL, 1.0f, c->data->GetRotation());
 		c = c->next;
 	}
 
