@@ -45,7 +45,7 @@ public:
 	//sensors
 	p2List<PhysBody*> green_sensors;
 	PhysBody* loosing_sensor;
-	bool reproducing = false; //makes sure loosing sound triggers only one time
+	bool lost = false;
 
 	PhysBody* air_sensor;
 	PhysBody* grounded_sensor;

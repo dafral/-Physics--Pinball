@@ -46,7 +46,7 @@ bool ModuleSceneIntro::Start()
 
 	
 	//sensors
-	loosing_sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
+	loosing_sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, 865, SCREEN_WIDTH, 50);
 	loosing_sensor->listener = this;
 
 	air_sensor = App->physics->CreateChain(0, 0, air_s, 8);
@@ -158,6 +158,17 @@ update_status ModuleSceneIntro::Update()
 		must_destroy = nullptr;
 	}
 
+	//new ball generated if you have enough balls
+	if (lost == true && balls > 0) {
+		ball->body->SetActive(false);
+		lost = false;
+
+		ball = App->physics->CreateCircle(434, 600, 8);
+		balls++;
+		ball->body->SetFixedRotation(true);
+		ball->body->GetFixtureList()->SetRestitution(0.3f);
+	}
+
 
 	//App->renderer->Blit(bouncer_kicked, x, y, NULL, 1.0f, NULL);
 
@@ -244,11 +255,10 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	if (bodyA == r_bouncy_t || bodyA == l_bouncy_t)
 		App->audio->PlayFx(iron_fx);
 
-	else if (bodyA == loosing_sensor && reproducing == false) {
+	else if (bodyA == loosing_sensor) {
 		App->audio->PlayFx(start_fx);
-		reproducing = true;
 		balls--;
-		
+		lost = true;
 
 	}
 
